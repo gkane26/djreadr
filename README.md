@@ -4,9 +4,9 @@ djreadr is an R package to facilitate reading data from a datajoint-python datab
 
 #### Requirements
 
-You must have datajoint installed in a python environment. Further, the directory with your schema definitions must be installed as a python module in the same environment. To install your schema directory as a python module:
- - add an `__init__.py` file to the schema directory. This file should contain one line: `from . import *`
- - in a terminal, navigate to the schema directory and run: `pip install -e .`
+You must have datajoint installed in a python environment, and you must be able to import your python-datajoint schema (just as you would in python). The working directory of your R session can be set to your datajoint schema directory (to import in python using `from . import my_schema`). Preferably, you can install your python-datajoint schema as a python module, which can be imported from any location. To do so:
+ - add an `__init__.py` file to the schema directory (can be empty)
+ - create a `setup.py` file in the parent directory
 
 #### Installation
 

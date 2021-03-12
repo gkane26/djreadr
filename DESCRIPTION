@@ -8,5 +8,9 @@ Description: Read data from datajoint-python database
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
-Imports: reticulate
+RoxygenNote: 7.1.1
+Imports:
+  reticulate,
+  data.table
+Remotes:
+  github::rstudio/reticulate
