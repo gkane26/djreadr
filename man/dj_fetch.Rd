@@ -3,15 +3,13 @@
 \name{dj_fetch}
 \alias{dj_fetch}
 \title{Get datajoint table}
-\format{
-string; format to fetch data. either "dict" for dictionary or "df" for data.frame
-}
 \usage{
 dj_fetch(
   sch = NULL,
   tbl = NULL,
   restrictions = NULL,
   query = NULL,
+  keys = NULL,
   format = "dict",
   callback = NULL,
   add_vars = list(),
@@ -28,6 +26,10 @@ If providing query, sch should consist of all schemas used in the query. Can be 
 \item{restrictions}{a vector of strings containing restrictions. See details. Only used with sch and tbl}
 
 \item{query}{a python datajoint query as a string. Must specify either (sch and tbl) or sch and query}
+
+\item{keys}{a list of keys to fetch. If NULL, fetches the whole table as dict or data.frame (see format)}
+
+\item{format}{string; format to fetch data. either "dict" for dictionary or "df" for data.frame}
 
 \item{callback}{a callback function to process data returned from the query}
 

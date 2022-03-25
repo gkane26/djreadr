@@ -8,7 +8,8 @@
 #' @param tbl the table to fetch. Must specify either (sch and tbl) or query
 #' @param restrictions a vector of strings containing restrictions. See details. Only used with sch and tbl
 #' @param query a python datajoint query as a string. Must specify either (sch and tbl) or sch and query
-#' @format string; format to fetch data. either "dict" for dictionary or "df" for data.frame
+#' @param keys a list of keys to fetch. If NULL, fetches the whole table as dict or data.frame (see format)
+#' @param format string; format to fetch data. either "dict" for dictionary or "df" for data.frame
 #' @param callback a callback function to process data returned from the query
 #' @param add_vars a list of additional variables to add to the data, optional
 #' @param ... additional arguments passed to callback
@@ -16,7 +17,7 @@
 #' @return if callback is specified, data is returned in the form of the callback's return. otherwise, returns data fetched from datajoint table as a list.
 #'
 #' @export
-dj_fetch = function(sch=NULL, tbl=NULL, restrictions=NULL, query=NULL, format="dict", callback=NULL, add_vars=list(), ...){
+dj_fetch = function(sch=NULL, tbl=NULL, restrictions=NULL, query=NULL, keys=NULL, format="dict", callback=NULL, add_vars=list(), ...){
 
   # create query
   if (!is.null(sch) & !is.null(tbl)) {
@@ -36,19 +37,23 @@ dj_fetch = function(sch=NULL, tbl=NULL, restrictions=NULL, query=NULL, format="d
   reticulate::py_run_string(paste0("qry = ", query))
 
   # fetch data from python space
-  if (format == "dict") {
-    dat = reticulate::py$qry$fetch(as_dict=T)
-    if (length(dat) > 0) {
-      for (i in 1:length(dat)) dat[[i]] = c(dat[[i]], add_vars)
+  if (is.null(keys)) {
+    if (format == "dict") {
+      dat = reticulate::py$qry$fetch(as_dict=T)
+      if (length(dat) > 0) {
+        for (i in 1:length(dat)) dat[[i]] = c(dat[[i]], add_vars)
+      }
+    } else if (format == "df") {
+      reticulate::py_run_string("dat = qry.fetch(format='frame')")
+      reticulate::py_run_string("dat = dat.reset_index()")
+      dat = data.table::setDT(reticulate::py$dat)
+      if (length(add_vars > 0))
+        for (i in 1:length(add_vars)) dat[[names(add_vars[i])]] = add_vars[[i]]
+    } else {
+      stop("format not supported!")
     }
-  } else if (format == "df") {
-    reticulate::py_run_string("dat = qry.fetch(format='frame')")
-    reticulate::py_run_string("dat = dat.reset_index()")
-    dat = data.table::setDT(reticulate::py$dat)
-    if (length(add_vars > 0))
-      for (i in 1:length(add_vars)) dat[[names(add_vars[i])]] = add_vars[[i]]
   } else {
-    stop("format not supported!")
+    dat = reticulate::py$qry$fetch(keys)
   }
 
   # call the callback function
