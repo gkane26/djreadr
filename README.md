@@ -25,11 +25,8 @@ To read in data from datajoint, use the following workflow:
 # load the djreadr package
 library(djreadr)
 
-# if datajoint is installed in a conda environment or virtualenvironment, set the correct envirnoment:
-set_python(conda="dj") # the name of the conda environment
-set_python(venv="dj") # the name of the virtual environment
-
-# set the datajoint configuration (if necessary, you should only need to do this once in either python or R)
+# set the datajoint configuration, if necessary
+# (skip this step if you've already saved your credentials, e.g., using dj.config.save_global())
 host = '127.0.0.1:3306'
 user = 'root'
 password = 'simple'
@@ -50,7 +47,7 @@ my_data = dj_fetch(sch=sch, tbl=tbl, restrictions=restrictions)
 query = "exp.Session() * (mice.Mouse() & 'mouse_name=\"mymouse\"')"
 my_data = dj_fetch(query=query)
 
-# 2b. same as 2a, but returns results as a data frame -- equivalent to using MyTable.fetch(format="frame") in datajoint-python
+# 2b. same as 2a, but returns results as a data.table -- equivalent to using MyTable.fetch(format="frame") in datajoint-python
 query = "exp.Session() * (mice.Mouse() & 'mouse_name=\"mymouse\"')"
 my_data = dj_fetch(query=query, format="df")
 
